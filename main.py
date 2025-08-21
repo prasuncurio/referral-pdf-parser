@@ -125,10 +125,10 @@ class MedicalPDFParser:
         # Method 1: Try PyMuPDF (fitz) - often works better
         try:
             doc = fitz.open(pdf_path)
-            self.logger.info(f'Num pages: {len(doc)}')
+            self.logger.debug(f'Num pages: {len(doc)}')
             for i, page in enumerate(doc):
-                self.logger.info(f'Page {i+1} text length: {len(page.get_text())}')
-                self.logger.info(f'Page {i+1} has images: {len(page.get_images())}')
+                self.logger.debug(f'Page {i+1} text length: {len(page.get_text())}')
+                self.logger.debug(f'Page {i+1} has images: {len(page.get_images())}')
                 text += page.get_text() + "\n"
             doc.close()
             if text.strip():
@@ -188,6 +188,8 @@ class MedicalPDFParser:
         patient_name_patterns = [
             r"Patient Name\s*[:\s]*([A-Z]+),\s*([A-Z]+)",  # LASTNAME, FIRSTNAME
             r"Patient Name\s*[:\s]*([A-Za-z]+)\s+([A-Za-z]+)",  # FIRSTNAME LASTNAME
+            r"Ratient Name\s*[:\s]*([A-Z]+),\s*([A-Z]+)",  # LASTNAME, FIRSTNAME
+            r"Ratient Name\s*[:\s]*([A-Za-z]+)\s+([A-Za-z]+)",  # FIRSTNAME LASTNAME
         ]
         
         for pattern in patient_name_patterns:
@@ -311,7 +313,7 @@ class MedicalPDFParser:
 
         # Referral Order Section
         referral_order_info_start = text.find("Referral Order Information")
-        referral_order_info_end = text.find("Patient information")
+        referral_order_info_end = text.find("Patient Information")
         referral_order_info_text = text[referral_order_info_start:referral_order_info_end] if referral_order_info_start != -1 else ""
         self.logger.info(f'Referral Order Info text: {referral_order_info_text}')
         
@@ -358,7 +360,7 @@ def main():
     parser = MedicalPDFParser()
     
     # Example usage for single PDF
-    pdf_path = "./data/test1.pdf"
+    pdf_path = "./data/test2.pdf"
     result = parser.parse_pdf(pdf_path)
     
     print("Extracted Information:")
